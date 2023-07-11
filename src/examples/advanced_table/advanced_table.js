@@ -1,6 +1,6 @@
-import { options } from './options.js';
-import GlobalConfig from './globalConfig.js';
-import PivotHeader from './pivotHeader.js';
+import { options } from "./options.js";
+import GlobalConfig from "./globalConfig.js";
+import PivotHeader from "./pivotHeader.js";
 
 /* eslint-disable arrow-body-style, no-undef, no-use-before-define */
 
@@ -49,16 +49,20 @@ class AgData {
   }
 
   formatData() {
-    this.formattedData = this.data.map(datum => {
+    this.formattedData = this.data.map((datum) => {
       const formattedDatum = {};
 
-      this.formattedColumns.forEach(col => {
+      this.formattedColumns.forEach((col) => {
         const { children, colType, field: colField, lookup } = col;
-        if (colType === 'row') { return; }
+        if (colType === "row") {
+          return;
+        }
 
-        if (colType === 'pivot') {
-          children.forEach(child => {
-            formattedDatum[child.field] = displayData(datum[child.measure][child.pivotKey]);
+        if (colType === "pivot") {
+          children.forEach((child) => {
+            formattedDatum[child.field] = displayData(
+              datum[child.measure][child.pivotKey]
+            );
           });
         } else {
           formattedDatum[colField] = displayData(datum[lookup]);
@@ -73,12 +77,12 @@ class AgData {
 const adjustFonts = () => {
   const { config } = globalConfig;
 
-  if ('fontFamily' in config) {
-    const mainDiv = document.getElementById('ag-grid-vis');
+  if ("fontFamily" in config) {
+    const mainDiv = document.getElementById("ag-grid-vis");
     mainDiv.style.fontFamily = config.fontFamily;
   }
 
-  if ('rowHeight' in config) {
+  if ("rowHeight" in config) {
     gridOptions.rowHeight = config.rowHeight;
   }
 };
@@ -92,7 +96,10 @@ const autoSize = () => {
   if (config.autoSizeEnabled) {
     gridOptions.columnApi.autoSizeAllColumns();
     const { gridPanel } = gridOptions.api;
-    if (gridPanel.eBodyHorizontalScrollContainer.scrollWidth < gridPanel.eBodyViewport.scrollWidth) {
+    if (
+      gridPanel.eBodyHorizontalScrollContainer.scrollWidth <
+      gridPanel.eBodyViewport.scrollWidth
+    ) {
       gridOptions.api.sizeColumnsToFit();
     }
   }
@@ -100,8 +107,8 @@ const autoSize = () => {
 
 // Removes the current stylesheet in favor of user-selected theme in config.
 const updateTheme = (classList, theme) => {
-  const currentClass = _.find(classList, klass => {
-    const match = klass.match('ag-theme');
+  const currentClass = _.find(classList, (klass) => {
+    const match = klass.match("ag-theme");
     if (match !== null) {
       return match.input;
     }
@@ -115,46 +122,51 @@ const updateTheme = (classList, theme) => {
 
 // All of the currently supported ag-grid stylesheets.
 const themes = [
-  { Looker: 'ag-theme-looker' },
-  { Balham: 'ag-theme-balham' },
-  { Fresh: 'ag-theme-fresh' },
-  { Dark: 'ag-theme-dark' },
-  { Blue: 'ag-theme-blue' },
-  { Bootstrap: 'ag-theme-bootstrap' },
+  { Looker: "ag-theme-looker" },
+  { Balham: "ag-theme-balham" },
+  { Fresh: "ag-theme-fresh" },
+  { Dark: "ag-theme-dark" },
+  { Blue: "ag-theme-blue" },
+  { Bootstrap: "ag-theme-bootstrap" },
 ];
 
-const defaultTheme = 'ag-theme-looker';
+const defaultTheme = "ag-theme-looker";
 
-const addCSS = link => {
-  const linkElement = document.createElement('link');
+const addCSS = (link) => {
+  const linkElement = document.createElement("link");
 
-  linkElement.setAttribute('rel', 'stylesheet');
-  linkElement.setAttribute('href', link);
+  linkElement.setAttribute("rel", "stylesheet");
+  linkElement.setAttribute("href", link);
 
-  document.getElementsByTagName('head')[0].appendChild(linkElement);
+  document.getElementsByTagName("head")[0].appendChild(linkElement);
 };
 
 // Load all ag-grid default style themes.
 const loadStylesheets = () => {
-  addCSS('https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css');
-  addCSS('https://4mile.github.io/ag_grid/ag-theme-looker.css');
+  addCSS("https://unpkg.com/ag-grid-community@20.1.0/dist/styles/ag-grid.css");
+  addCSS("https://4mile.github.io/ag_grid/ag-theme-looker.css");
   // XXX For development only:
   // addCSS('https://localhost:4443/ag-theme-looker.css');
-  themes.forEach(theme => {
+  themes.forEach((theme) => {
     const themeName = theme[Object.keys(theme)];
-    if (themeName !== 'ag-theme-looker') {
-      addCSS(`https://unpkg.com/ag-grid-community/dist/styles/${themeName}.css`);
+    if (themeName !== "ag-theme-looker") {
+      addCSS(
+        `https://unpkg.com/ag-grid-community@20.1.0/dist/styles/${themeName}.css`
+      );
     }
   });
 };
 
-const drillingCallback = event => { // eslint-disable-line
+const drillingCallback = (event) => {
+  // eslint-disable-line
   const ds = event.currentTarget.dataset;
   const keys = Object.keys(ds);
   let links = [];
-  _.forEach(keys, key => {
-    const [k, i] = key.split('-');
-    if (!links[i]) { links[i] = {}; }
+  _.forEach(keys, (key) => {
+    const [k, i] = key.split("-");
+    if (!links[i]) {
+      links[i] = {};
+    }
     links[i][k] = ds[key];
   });
   LookerCharts.Utils.openDrillMenu({ links, event });
@@ -165,28 +177,35 @@ const drillingCallback = event => { // eslint-disable-line
 //
 
 // The mere presence of this renderer is enough to actually render HTML.
-const defaultCellRenderer = obj => obj.value;
+const defaultCellRenderer = (obj) => obj.value;
 
 // Looker's table is 1-indexed.
-const rowNumberRenderer = obj => obj.rowIndex + 1;
+const rowNumberRenderer = (obj) => obj.rowIndex + 1;
 
 //
 // User-defined aggregation functions
 //
 
 const aggregate = (values, mType, valueFormat) => {
-  if (_.isEmpty(values)) { return; }
+  if (_.isEmpty(values)) {
+    return;
+  }
   let agg;
-  const avgTypes = ['average', 'average_distinct', 'percent_of_total', 'number'];
+  const avgTypes = [
+    "average",
+    "average_distinct",
+    "percent_of_total",
+    "number",
+  ];
   // Looker aggregation type source:
   // https://docs.looker.com/reference/field-reference/measure-type-reference
-  if (mType === 'count' || mType === 'count_distinct') {
+  if (mType === "count" || mType === "count_distinct") {
     agg = countAggFn(values);
   } else if (avgTypes.includes(mType)) {
     agg = avgAggFn(values);
-  } else if (mType === 'max') {
+  } else if (mType === "max") {
     agg = maxAggFn(values);
-  } else if (mType === 'min') {
+  } else if (mType === "min") {
     agg = minAggFn(values);
   } else {
     // Default to sum.
@@ -194,7 +213,7 @@ const aggregate = (values, mType, valueFormat) => {
   }
   let value;
   if (_.isEmpty(valueFormat)) {
-    value = isFloat(agg) ? truncFloat(agg, values) : numeral(agg).format(',');
+    value = isFloat(agg) ? truncFloat(agg, values) : numeral(agg).format(",");
   } else {
     value = formatNumeral(numeral(agg), valueFormat);
   }
@@ -205,39 +224,55 @@ const formatNumeral = (num, valueFormat) => {
   let formatted = num.format(valueFormat);
   // EUR and GBP symbols don't play nice with this JS formatting library.
   // Below are shims to replace the foreign currency.
-  if (valueFormat.includes('€')) {
-    valueFormat = valueFormat.replace(new RegExp('"', 'g'), '').replace('€', '$');
-    formatted = num.format(valueFormat).replace('$', '€');
+  if (valueFormat.includes("€")) {
+    valueFormat = valueFormat
+      .replace(new RegExp('"', "g"), "")
+      .replace("€", "$");
+    formatted = num.format(valueFormat).replace("$", "€");
   }
-  if (valueFormat.includes('£')) {
-    valueFormat = valueFormat.replace(new RegExp('"', 'g'), '').replace('£', '$');
-    formatted = num.format(valueFormat).replace('$', '£');
+  if (valueFormat.includes("£")) {
+    valueFormat = valueFormat
+      .replace(new RegExp('"', "g"), "")
+      .replace("£", "$");
+    formatted = num.format(valueFormat).replace("$", "£");
   }
   return formatted;
 };
 
-const sumAggFn = values => {
-  return _.reduce(values, (sum, n) => {
-    return sum + n;
-  }, 0);
+const sumAggFn = (values) => {
+  return _.reduce(
+    values,
+    (sum, n) => {
+      return sum + n;
+    },
+    0
+  );
 };
 
-const avgAggFn = values => {
-  const total = _.reduce(values, (sum, n) => {
-    return sum + n;
-  }, 0);
+const avgAggFn = (values) => {
+  const total = _.reduce(
+    values,
+    (sum, n) => {
+      return sum + n;
+    },
+    0
+  );
 
   return total / values.length;
 };
 
-const maxAggFn = values => _.max(values);
+const maxAggFn = (values) => _.max(values);
 
-const minAggFn = values => _.min(values);
+const minAggFn = (values) => _.min(values);
 
-const countAggFn = values => {
-  return _.reduce(values, (sum, n) => {
-    return sum + parseInt(n, 10);
-  }, 0);
+const countAggFn = (values) => {
+  return _.reduce(
+    values,
+    (sum, n) => {
+      return sum + parseInt(n, 10);
+    },
+    0
+  );
 };
 
 //
@@ -248,16 +283,16 @@ const countAggFn = values => {
 // specifically indicate one, based on the first value of the column. If not a float,
 // keeps as int.
 const truncFloat = (float, values) => {
-  const firstVal = values[0].toString().split('.');
+  const firstVal = values[0].toString().split(".");
   let digits;
   if (firstVal.length > 1) {
     digits = firstVal.pop().length;
     return float.toFixed(digits);
   }
-  return numeral(float.toFixed(0)).format(',');
+  return numeral(float.toFixed(0)).format(",");
 };
 
-const isFloat = num => {
+const isFloat = (num) => {
   return Number.isInteger(num) === false && num % 1 !== 0;
 };
 
@@ -267,25 +302,33 @@ const isFloat = num => {
 // than if we had used the simpler ag-grid individual column aggregate.
 // (The simpler function only gives us raw values here, and no indication as to
 // which column it belongs to.)
-const groupRowAggNodes = nodes => {
+const groupRowAggNodes = (nodes) => {
   // This method is called often by ag-grid, sometimes with no nodes.
-  if (!_.isEmpty(gridOptions.columnDefs)) { return; }
+  if (!_.isEmpty(gridOptions.columnDefs)) {
+    return;
+  }
   const { queryResponse } = globalConfig;
-  if (_.isEmpty(nodes) || queryResponse === undefined) { return; }
+  if (_.isEmpty(nodes) || queryResponse === undefined) {
+    return;
+  }
 
   const { measure_like: measures } = queryResponse.fields;
   const result = {};
   const genericNullValue = LookerCharts.Utils.textForCell({ value: null });
   if (!_.isEmpty(queryResponse.pivots)) {
     const { pivots } = queryResponse;
-    const fields = pivots.flatMap(pivot => {
-      return measures.map(measure => { return `${pivot.key}_${measure.name}`; });
+    const fields = pivots.flatMap((pivot) => {
+      return measures.map((measure) => {
+        return `${pivot.key}_${measure.name}`;
+      });
     });
-    fields.forEach(field => { result[field] = []; });
-    nodes.forEach(node => {
+    fields.forEach((field) => {
+      result[field] = [];
+    });
+    nodes.forEach((node) => {
       const data = node.group ? node.aggData : node.data;
-      fields.forEach(field => {
-        if (typeof data[field] !== 'undefined') {
+      fields.forEach((field) => {
+        if (typeof data[field] !== "undefined") {
           let val = cellValue(data[field]);
           const value = numeral(val).value();
           if (value !== null) {
@@ -294,26 +337,26 @@ const groupRowAggNodes = nodes => {
         }
       });
     });
-    pivots.forEach(pivot => {
+    pivots.forEach((pivot) => {
       // Map over again to calculate a final result value and convert to value_format.
-      measures.forEach(measure => {
+      measures.forEach((measure) => {
         const { type: mType, value_format: valueFormat } = measure;
         const formattedField = `${pivot.key}_${measure.name}`;
-        result[formattedField] = aggregate(
-          result[formattedField], mType, valueFormat
-        ) || genericNullValue;
+        result[formattedField] =
+          aggregate(result[formattedField], mType, valueFormat) ||
+          genericNullValue;
       });
     });
   } else {
-    measures.forEach(measure => {
+    measures.forEach((measure) => {
       result[measure.name] = [];
     });
     // Map over once to determine type and populate results array.
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       const data = node.group ? node.aggData : node.data;
-      measures.forEach(measure => {
+      measures.forEach((measure) => {
         const { name } = measure;
-        if (typeof data[name] !== 'undefined') {
+        if (typeof data[name] !== "undefined") {
           let val = cellValue(data[name]);
           const value = numeral(val).value();
           if (value !== null) {
@@ -324,9 +367,10 @@ const groupRowAggNodes = nodes => {
     });
 
     // Map over again to calculate a final result value and convert to value_format.
-    measures.forEach(measure => {
+    measures.forEach((measure) => {
       const { name, type: mType, value_format: valueFormat } = measure;
-      result[name] = aggregate(result[name], mType, valueFormat) || genericNullValue;
+      result[name] =
+        aggregate(result[name], mType, valueFormat) || genericNullValue;
     });
   }
 
@@ -334,7 +378,11 @@ const groupRowAggNodes = nodes => {
   // The top level aggregate here isn't actually shown on our grouped table, and
   // shouldn't be counted towards the conditional formatting ranges.
   const includeInRange = nodes[0].level !== 0;
-  if (includeInRange && config.enableConditionalFormatting && config.conditionalFormattingType !== 'non_subtotals_only') {
+  if (
+    includeInRange &&
+    config.enableConditionalFormatting &&
+    config.conditionalFormattingType !== "non_subtotals_only"
+  ) {
     // We want to add subtotal values to the ranges. Note: This isn't ideal/finalized behavior;
     // final behavior would have these values exist within their own range, which will require
     // cellStyle to understand if the cell is a subtotal (I think possible), and then draw from a diff. range.
@@ -348,10 +396,16 @@ const groupRowAggNodes = nodes => {
 };
 
 const updateRange = (key, value, range) => {
-  if (!range) { return; }
+  if (!range) {
+    return;
+  }
   // Global:
-  if (!('min' in range)) { range.min = value; }
-  if (!('max' in range)) { range.max = value; }
+  if (!("min" in range)) {
+    range.min = value;
+  }
+  if (!("max" in range)) {
+    range.max = value;
+  }
   if (value < range.min) {
     range.min = value;
   }
@@ -374,7 +428,7 @@ const updateRange = (key, value, range) => {
 const headerName = (dimension, config) => {
   let label;
   const customLabel = config[`customLabel_${dimension.name}`];
-  if (customLabel !== undefined && customLabel !== '') {
+  if (customLabel !== undefined && customLabel !== "") {
     label = config[`customLabel_${dimension.name}`];
   } else if (config.showFullFieldName) {
     label = dimension.label;
@@ -394,26 +448,26 @@ const alignText = (styling, config, cell) => {
   const { field } = cell.colDef;
   const alignment = `align_${field}`;
   if (alignment in config) {
-    styling['text-align'] = config[alignment];
+    styling["text-align"] = config[alignment];
   }
 };
 
 const formatText = (styling, config, cell) => {
   const { field } = cell.colDef;
   const fontFormat = `fontFormat_${field}`;
-  if (fontFormat in config && config[fontFormat] !== 'none') {
+  if (fontFormat in config && config[fontFormat] !== "none") {
     switch (config[fontFormat]) {
-      case 'bold':
-        styling['font-weight'] = '800';
+      case "bold":
+        styling["font-weight"] = "800";
         break;
-      case 'italic':
-        styling['font-style'] = 'italic';
+      case "italic":
+        styling["font-style"] = "italic";
         break;
-      case 'underline':
-        styling['text-decoration'] = 'underline';
+      case "underline":
+        styling["text-decoration"] = "underline";
         break;
-      case 'strikethrough':
-        styling['text-decoration'] = 'line-through';
+      case "strikethrough":
+        styling["text-decoration"] = "line-through";
         break;
     }
   }
@@ -421,10 +475,10 @@ const formatText = (styling, config, cell) => {
 
 // Some measures contain just a value, others are an href/html for drilling.
 // This function derives a raw numerical value for either case.
-const cellValue = value => {
+const cellValue = (value) => {
   let val;
-  if (value && value[0] === '<') {
-    const span = document.createElement('span');
+  if (value && value[0] === "<") {
+    const span = document.createElement("span");
     span.innerHTML = value;
     val = span.textContent || span.innerText;
   } else {
@@ -434,25 +488,42 @@ const cellValue = value => {
 };
 
 const setFontSize = (styling, config) => {
-  if ('fontSize' in config) {
-    styling['font-size'] = `${config['fontSize']}px`;
+  if ("fontSize" in config) {
+    styling["font-size"] = `${config["fontSize"]}px`;
   }
 };
 
 const conditionallyFormat = (styling, config, cell) => {
   const { range } = globalConfig;
   const { field, measure } = cell.colDef;
-  if (config.enableConditionalFormatting === undefined || !config.enableConditionalFormatting) { return styling; }
-  if (config.conditionalFormattingType === 'non_subtotals_only' && cell.node.group === true) { return styling; }
-  if (config.conditionalFormattingType === 'subtotals_only' && cell.node.group === false) { return styling; }
+  if (
+    config.enableConditionalFormatting === undefined ||
+    !config.enableConditionalFormatting
+  ) {
+    return styling;
+  }
+  if (
+    config.conditionalFormattingType === "non_subtotals_only" &&
+    cell.node.group === true
+  ) {
+    return styling;
+  }
+  if (
+    config.conditionalFormattingType === "subtotals_only" &&
+    cell.node.group === false
+  ) {
+    return styling;
+  }
 
-  if (!(range.keys.includes(measure)) && !(range.keys.includes(field))) { return styling; }
+  if (!range.keys.includes(measure) && !range.keys.includes(field)) {
+    return styling;
+  }
   const { lowColor, midColor, highColor } = config;
   let colorScheme = [lowColor, midColor, highColor];
-  if (config.formattingStyle === 'high_to_low') {
+  if (config.formattingStyle === "high_to_low") {
     colorScheme = [highColor, midColor, lowColor];
   }
-  const scale = chroma.scale(colorScheme.filter(color => !!color));
+  const scale = chroma.scale(colorScheme.filter((color) => !!color));
   let supportedRange = range;
   if (config.perColumnRange) {
     supportedRange = range[field];
@@ -464,15 +535,17 @@ const conditionallyFormat = (styling, config, cell) => {
   }
   let normalizedValue = normalize(v, supportedRange);
   if (isNaN(normalizedValue) || _.isNull(normalizedValue)) {
-    if (!config.includeNullValuesAsZero) { return; }
+    if (!config.includeNullValuesAsZero) {
+      return;
+    }
     normalizedValue = 0;
   }
 
-  styling['background-color'] = scale(normalizedValue).hex();
+  styling["background-color"] = scale(normalizedValue).hex();
 };
 
 // Used to apply conditional formatting to cells, if enabled.
-const cellStyle = cell => {
+const cellStyle = (cell) => {
   const { config } = globalConfig;
   const styling = {};
 
@@ -486,28 +559,38 @@ const cellStyle = cell => {
 
 const normalize = (value, range) => {
   // Edge case when there is only one value to avoid NaN response.
-  if (range.max === range.min && value === range.max) { return 1; }
+  if (range.max === range.min && value === range.max) {
+    return 1;
+  }
   return (value - range.min) / (range.max - range.min);
 };
 
 const setNonPivotRange = (datum, key, range) => {
   const val = getValue(datum[key].value);
-  if (!_.isNull(val)) { updateRange(key, val, range); }
+  if (!_.isNull(val)) {
+    updateRange(key, val, range);
+  }
 };
 
 const setPivotRange = (datum, key, range) => {
   // datum[key] is a hash with all the pivot keys.
   const pivotKeys = Object.keys(datum[key]);
-  _.forEach(pivotKeys, pk => {
+  _.forEach(pivotKeys, (pk) => {
     const val = getValue(datum[key][pk].value);
-    if (!_.isNull(val)) { updateRange(`${pk}_${key}`, val, range); }
+    if (!_.isNull(val)) {
+      updateRange(`${pk}_${key}`, val, range);
+    }
   });
 };
 
-const getValue = val => {
+const getValue = (val) => {
   const { config } = globalConfig;
-  if (_.isUndefined(config)) { return; }
-  if (!('includeNullValuesAsZero' in config)) { return; }
+  if (_.isUndefined(config)) {
+    return;
+  }
+  if (!("includeNullValuesAsZero" in config)) {
+    return;
+  }
   let value = numeral(val).value();
   if (_.isNull(value) && config.includeNullValuesAsZero) {
     value = 0;
@@ -522,16 +605,23 @@ const getValue = val => {
 // max => the global maximum value
 // Each key in keys also consists of a hash with { min, max }
 const calculateRange = (data, queryResponse, config) => {
-  if (!('applyTo' in config)) { return {}; }
-  let keys = _.map(queryResponse.fields.measure_like, measureLike => measureLike.name);
-  if (config.applyTo === 'select_fields') {
-    keys = keys.filter(key => globalConfig.selectedFields.includes(key));
+  if (!("applyTo" in config)) {
+    return {};
+  }
+  let keys = _.map(
+    queryResponse.fields.measure_like,
+    (measureLike) => measureLike.name
+  );
+  if (config.applyTo === "select_fields") {
+    keys = keys.filter((key) => globalConfig.selectedFields.includes(key));
   }
   const range = { keys };
-  if (config.conditionalFormattingType === 'subtotals_only') { return range; }
+  if (config.conditionalFormattingType === "subtotals_only") {
+    return range;
+  }
 
-  data.forEach(datum => {
-    keys.forEach(key => {
+  data.forEach((datum) => {
+    keys.forEach((key) => {
       if (_.isEmpty(queryResponse.pivots)) {
         setNonPivotRange(datum, key, range);
       } else {
@@ -543,13 +633,13 @@ const calculateRange = (data, queryResponse, config) => {
   return range;
 };
 
-const addRowNumbers = basics => {
+const addRowNumbers = (basics) => {
   basics.unshift({
-    cellClass: ['rowNumber', 'groupCell'],
+    cellClass: ["rowNumber", "groupCell"],
     cellRenderer: rowNumberRenderer,
-    colType: 'row',
-    headerClass: 'rowNumberHeader',
-    headerName: '',
+    colType: "row",
+    headerClass: "rowNumberHeader",
+    headerName: "",
     lockPosition: true,
     resizable: false,
     rowGroup: false,
@@ -557,7 +647,7 @@ const addRowNumbers = basics => {
     suppressMenu: true,
     suppressNavigable: true,
     suppressSizeToFit: true,
-    valueGetter: 'node.rowIndex + 1',
+    valueGetter: "node.rowIndex + 1",
     width: 50,
   });
 };
@@ -565,7 +655,7 @@ const addRowNumbers = basics => {
 // Base dimensions before table calcs, pivots, measures, etc added.
 const basicDimensions = (dimensions, config) => {
   const finalDimension = dimensions[dimensions.length - 1];
-  const basics = _.map(dimensions, dimension => {
+  const basics = _.map(dimensions, (dimension) => {
     let rowGroup;
     // If there is only 1 dimension, then we are going to display without grouping.
     if (dimensions.length <= 1) {
@@ -578,7 +668,7 @@ const basicDimensions = (dimensions, config) => {
       cellClass: dimension.category,
       cellRenderer: defaultCellRenderer,
       cellStyle,
-      colType: 'default',
+      colType: "default",
       comparator: comparator,
       field: dimension.name,
       headerClass: dimension.category,
@@ -605,13 +695,13 @@ const basicDimensions = (dimensions, config) => {
 
 const addTableCalculations = (dimensions, tableCalcs) => {
   let dimension;
-  const klass = 'tableCalc';
-  tableCalcs.forEach(calc => {
+  const klass = "tableCalc";
+  tableCalcs.forEach((calc) => {
     dimension = {
       cellClass: klass,
       cellStyle,
       cellRenderer: defaultCellRenderer,
-      colType: 'table_calculation',
+      colType: "table_calculation",
       field: calc.name,
       headerClass: klass,
       headerName: calc.label,
@@ -638,14 +728,14 @@ const comparator = (valueA, valueB) => {
 
 const addMeasures = (dimensions, measures, config) => {
   let dimension;
-  const klass = 'measure';
-  measures.forEach(measure => {
+  const klass = "measure";
+  measures.forEach((measure) => {
     const { name } = measure;
     dimension = {
       cellClass: klass,
       cellStyle,
       cellRenderer: defaultCellRenderer,
-      colType: 'measure',
+      colType: "measure",
       comparator: comparator,
       field: name,
       headerClass: klass,
@@ -668,13 +758,13 @@ const addPivots = (dimensions, config) => {
   const { pivots } = queryResponse;
 
   let dimension;
-  pivots.forEach(pivot => {
+  pivots.forEach((pivot) => {
     const { key } = pivot;
-    const keys = key.split('|FIELD|').join(', ');
+    const keys = key.split("|FIELD|").join(", ");
 
     const outerDimension = {
       children: [],
-      colType: 'pivot',
+      colType: "pivot",
       field: key,
       headerGroupComponent: PivotHeader,
       headerName: keys,
@@ -682,19 +772,19 @@ const addPivots = (dimensions, config) => {
       suppressMenu: true,
     };
 
-    measureLike.forEach(measure => {
+    measureLike.forEach((measure) => {
       const { name } = measure;
       let klass = measure.category;
       if (_.isUndefined(klass) && measure.is_table_calculation) {
-        klass = 'tableCalc';
+        klass = "tableCalc";
       }
 
       dimension = {
         cellClass: klass,
         cellStyle,
         cellRenderer: defaultCellRenderer,
-        colType: 'pivotChild',
-        columnGroupShow: 'open',
+        colType: "pivotChild",
+        columnGroupShow: "open",
         comparator: comparator,
         field: `${key}_${name}`,
         headerClass: klass,
@@ -716,20 +806,29 @@ const addPivots = (dimensions, config) => {
 };
 
 // Attempt to display in this order: HTML/drill -> rendered -> value
-const displayData = cell => {
-  if (_.isEmpty(cell)) { return null; }
+const displayData = (cell) => {
+  if (_.isEmpty(cell)) {
+    return null;
+  }
   let formattedCell;
   if (cell.links) {
-    let dataset = '';
+    let dataset = "";
     // Adding data to DOM that we will need when drilling into link which we would not
     // otherwise have when ag-grid hits our callback fn.
     _.forEach(cell.links, (link, i) => {
-      dataset += `data-label-${i}=${JSON.stringify(link.label)} data-url-${i}=${JSON.stringify(link.url)} data-type-${i}=${JSON.stringify(link.type)} `;
+      dataset += `data-label-${i}=${JSON.stringify(
+        link.label
+      )} data-url-${i}=${JSON.stringify(
+        link.url
+      )} data-type-${i}=${JSON.stringify(link.type)} `;
     });
     const val = !_.isUndefined(cell.rendered) ? cell.rendered : cell.value;
     formattedCell = `<a class='drillable-link' href="#" onclick="drillingCallback(event); return false;" ${dataset}>${val}</a>`;
   } else if (cell.html) {
-    formattedCell = LookerCharts.Utils.htmlForCell(cell).replace('<a ', '<a class="drillable-link" ');
+    formattedCell = LookerCharts.Utils.htmlForCell(cell).replace(
+      "<a ",
+      '<a class="drillable-link" '
+    );
   } else {
     formattedCell = LookerCharts.Utils.textForCell(cell);
   }
@@ -739,13 +838,13 @@ const displayData = cell => {
 
 class AutoGroupColumnDef {
   constructor() {
-    this.cellClass = 'groupCell';
-    this.cellRenderer = 'agGroupCellRenderer';
+    this.cellClass = "groupCell";
+    this.cellRenderer = "agGroupCellRenderer";
     this.cellRendererParams = {
       suppressCount: true,
     };
     this.cellStyle = cellStyle;
-    this.headerName = 'Group';
+    this.headerName = "Group";
     this.resizable = true;
     this.sortable = true;
   }
@@ -758,61 +857,57 @@ class AutoGroupColumnDef {
 const autoGroupColumnDef = new AutoGroupColumnDef();
 
 const defaultColors = {
-  red: '#F36254',
-  green: '#4FBC89',
-  yellow: '#FCF758',
-  white: '#FFFFFF',
+  red: "#F36254",
+  green: "#4FBC89",
+  yellow: "#FCF758",
+  white: "#FFFFFF",
 };
 
-const addOptionCustomLabels = fields => {
-  fields.forEach(field => {
+const addOptionCustomLabels = (fields) => {
+  fields.forEach((field) => {
     const { label, name } = field;
     const cl = `customLabel_${name}`;
     options[cl] = {
-      display: 'text',
+      display: "text",
       placeholder: `Label: ${label}`,
       label,
-      section: 'Series',
-      type: 'string',
+      section: "Series",
+      type: "string",
     };
   });
 };
 
-const addOptionAlignments = fields => {
-  fields.forEach(field => {
+const addOptionAlignments = (fields) => {
+  fields.forEach((field) => {
     const { label, name } = field;
     const alignment = `align_${name}`;
     options[alignment] = {
-      default: 'left',
-      display: 'select',
+      default: "left",
+      display: "select",
       label: `Text-align: ${label}`,
-      section: 'Config',
-      type: 'string',
-      values: [
-        { 'Left': 'left' },
-        { 'Center': 'center' },
-        { 'Right': 'right' },
-      ],
+      section: "Config",
+      type: "string",
+      values: [{ Left: "left" }, { Center: "center" }, { Right: "right" }],
     };
   });
 };
 
-const addOptionFontFormats = fields => {
-  fields.forEach(field => {
+const addOptionFontFormats = (fields) => {
+  fields.forEach((field) => {
     const { label, name } = field;
     const fontFormat = `fontFormat_${name}`;
     options[fontFormat] = {
-      default: 'none',
-      display: 'select',
+      default: "none",
+      display: "select",
       label: `Format: ${label}`,
-      section: 'Config',
-      type: 'string',
+      section: "Config",
+      type: "string",
       values: [
-        { 'None': 'none' },
-        { 'Bold': 'bold' },
-        { 'Italic': 'italic' },
-        { 'Underline': 'underline' },
-        { 'Strikethrough': 'strikethrough' },
+        { None: "none" },
+        { Bold: "bold" },
+        { Italic: "italic" },
+        { Underline: "underline" },
+        { Strikethrough: "strikethrough" },
       ],
     };
   });
@@ -820,75 +915,83 @@ const addOptionFontFormats = fields => {
 
 const updateColorConfig = (vis, config) => {
   const originalMidColor = {
-    display: 'color',
-    display_size: 'third',
-    label: 'Middle',
+    display: "color",
+    display_size: "third",
+    label: "Middle",
     order: 7,
-    section: 'Formatting',
-    type: 'string',
+    section: "Formatting",
+    type: "string",
   };
   // Automatically set the colors to defaults when selected.
-  if ('formattingPalette' in config && config.formattingPalette !== 'custom') {
+  if ("formattingPalette" in config && config.formattingPalette !== "custom") {
     let colors;
     switch (config.formattingPalette) {
-      case 'red_yellow_green':
-        if (!('midColor' in options)) { options.midColor = originalMidColor; }
+      case "red_yellow_green":
+        if (!("midColor" in options)) {
+          options.midColor = originalMidColor;
+        }
         colors = [
           { lowColor: defaultColors.red },
           { midColor: defaultColors.yellow },
           { highColor: defaultColors.green },
         ];
         break;
-      case 'red_white_green':
-        if (!('midColor' in options)) { options.midColor = originalMidColor; }
+      case "red_white_green":
+        if (!("midColor" in options)) {
+          options.midColor = originalMidColor;
+        }
         colors = [
           { lowColor: defaultColors.red },
           { midColor: defaultColors.white },
           { highColor: defaultColors.green },
         ];
         break;
-      case 'red_white':
-        if ('midColor' in options) { delete(options.midColor); }
+      case "red_white":
+        if ("midColor" in options) {
+          delete options.midColor;
+        }
         colors = [
           { lowColor: defaultColors.red },
           { highColor: defaultColors.white },
         ];
         break;
-      case 'white_green':
-        if ('midColor' in options) { delete(options.midColor); }
+      case "white_green":
+        if ("midColor" in options) {
+          delete options.midColor;
+        }
         colors = [
           { lowColor: defaultColors.white },
           { highColor: defaultColors.green },
         ];
         break;
     }
-    _.forEach(colors, color => vis.trigger('updateConfig', [color]));
+    _.forEach(colors, (color) => vis.trigger("updateConfig", [color]));
   }
 
   // Flip the labels accordingly.
-  if (config.formattingStyle === 'high_to_low') {
-    options.lowColor.label = 'High';
-    options.highColor.label = 'Low';
+  if (config.formattingStyle === "high_to_low") {
+    options.lowColor.label = "High";
+    options.highColor.label = "Low";
   } else {
-    options.lowColor.label = 'Low';
-    options.highColor.label = 'High';
+    options.lowColor.label = "Low";
+    options.highColor.label = "High";
   }
 };
 
 // Decide which columns will be getting conditional formatting applied.
 const selectFormattedFields = (fields, config) => {
-  if (config.applyTo === 'select_fields') {
-    fields.forEach(field => {
+  if (config.applyTo === "select_fields") {
+    fields.forEach((field) => {
       const { label, name } = field;
       const id = `selectedField_${name}`;
       options[id] = {
         label,
-        default: 'false',
-        section: 'Formatting',
-        type: 'boolean',
+        default: "false",
+        section: "Formatting",
+        type: "boolean",
       };
     });
-    fields.forEach(field => {
+    fields.forEach((field) => {
       const { name } = field;
       if (config[`selectedField_${name}`] === true) {
         globalConfig.addSelectedField(name);
@@ -896,11 +999,13 @@ const selectFormattedFields = (fields, config) => {
         globalConfig.removeSelectedField(name);
       }
     });
-  } else if (config.applyTo === 'all_numeric_fields') {
-    fields.forEach(field => {
+  } else if (config.applyTo === "all_numeric_fields") {
+    fields.forEach((field) => {
       const { name } = field;
       const id = `selectedField_${name}`;
-      if (id in options) { delete(options[id]); }
+      if (id in options) {
+        delete options[id];
+      }
     });
   }
 };
@@ -909,18 +1014,19 @@ const setupConditionalFormatting = (vis, config, measureLike) => {
   updateColorConfig(vis, config);
   selectFormattedFields(measureLike, config);
 
-  if ('enableConditionalFormatting' in config) {
+  if ("enableConditionalFormatting" in config) {
     options.perColumnRange.hidden = !config.enableConditionalFormatting;
   }
 
-  if ('formattingPalette' in config) {
-    const showColors = config.formattingPalette === 'custom';
+  if ("formattingPalette" in config) {
+    const showColors = config.formattingPalette === "custom";
     options.lowColor.hidden = !showColors;
-    if ('midColor' in options) { options.midColor.hidden = !showColors; }
+    if ("midColor" in options) {
+      options.midColor.hidden = !showColors;
+    }
     options.highColor.hidden = !showColors;
   }
 };
-
 
 // Once columns are available to ag-grid, we can update the options hash/config
 // and add/remove custom configurations.
@@ -936,23 +1042,31 @@ const modifyOptions = (vis, config) => {
 
   setupConditionalFormatting(vis, config, measureLike);
 
-  vis.trigger('registerOptions', options);
+  vis.trigger("registerOptions", options);
 };
 
 const addPivotLabels = () => {
-  if (!globalConfig.hasPivot) { return; }
+  if (!globalConfig.hasPivot) {
+    return;
+  }
   const { config, queryResponse } = globalConfig;
-  if (!('showRowNumbers' in config)) { return; }
-  const pivots = _.map(queryResponse.fields.pivots, pivot => headerName(pivot, config));
-  const labelDivs = document.getElementsByClassName('ag-header-group-cell-label');
+  if (!("showRowNumbers" in config)) {
+    return;
+  }
+  const pivots = _.map(queryResponse.fields.pivots, (pivot) =>
+    headerName(pivot, config)
+  );
+  const labelDivs = document.getElementsByClassName(
+    "ag-header-group-cell-label"
+  );
   const titleDiv = labelDivs[labelDivs.length - 1];
   if (!_.isUndefined(titleDiv)) {
-    titleDiv.classList.add('pivotHeaderNameContainer');
-    _.forEach(pivots, pivot => {
-      const pivotDiv = document.createElement('div');
+    titleDiv.classList.add("pivotHeaderNameContainer");
+    _.forEach(pivots, (pivot) => {
+      const pivotDiv = document.createElement("div");
       pivotDiv.innerHTML = `${pivot}:`;
-      pivotDiv.classList.add('pivotHeaderName');
-      pivotDiv.style.float = 'right';
+      pivotDiv.classList.add("pivotHeaderName");
+      pivotDiv.style.float = "right";
       titleDiv.appendChild(pivotDiv);
     });
   }
@@ -964,25 +1078,25 @@ const setColumns = () => {
 
 // Certain config changes require a refresh of the column headers - we only
 // will refresh them if needed.
-const refreshColumns = details => {
+const refreshColumns = (details) => {
   // If something on the grid has changed, we want to refresh it.
   if (details.changed) {
     const agColumn = new AgColumn(globalConfig.config);
     gridOptions.api.setColumnDefs(agColumn.formattedColumns);
   }
   // However, if we determine that the subtotaling isn't showing, we also want to redraw.
-  const values = document.getElementsByClassName('ag-cell-value');
-  if (values && _.some(values, value => value.childElementCount === 0)) {
+  const values = document.getElementsByClassName("ag-cell-value");
+  if (values && _.some(values, (value) => value.childElementCount === 0)) {
     const agColumn = new AgColumn(globalConfig.config);
     gridOptions.api.setColumnDefs(agColumn.formattedColumns);
   }
 };
 
 const setPivotHeaders = () => {
-  const pivotHeaders = document.getElementsByClassName('pivotHeader');
+  const pivotHeaders = document.getElementsByClassName("pivotHeader");
   if (!_.isEmpty(pivotHeaders)) {
     const parentRow = pivotHeaders[0].parentNode.parentNode.parentNode;
-    parentRow.classList.add('pivotHeaderRow');
+    parentRow.classList.add("pivotHeaderRow");
 
     // Set height according to how many pivots are present:
     const numPivots = globalConfig.queryResponse.fields.pivots.length;
@@ -995,7 +1109,10 @@ const setPivotHeaders = () => {
 // displaying before CSS files have been downloaded and applied).
 const hideOverlay = (vis, element, config) => {
   if (config.theme) {
-    const style = _.find(document.head.children, c => c.href && c.href.includes(config.theme));
+    const style = _.find(
+      document.head.children,
+      (c) => c.href && c.href.includes(config.theme)
+    );
     if (style.sheet && vis.loadingGrid.parentNode === element) {
       element.removeChild(vis.loadingGrid);
     }
@@ -1012,7 +1129,7 @@ const gridOptions = {
   autoGroupColumnDef,
   columnDefs: [],
   context: {
-    globalConfig: new GlobalConfig,
+    globalConfig: new GlobalConfig(),
     overlay: true,
   },
   enableFilter: false,
@@ -1021,7 +1138,7 @@ const gridOptions = {
   onFirstDataRendered: setColumns,
   onRowGroupOpened: adjustFonts,
   onSortChanged: sortChanged,
-  rowSelection: 'multiple',
+  rowSelection: "multiple",
   suppressAggFuncInHeader: true,
   suppressFieldDotNotation: true,
   suppressMovableColumns: true,
@@ -1059,12 +1176,12 @@ looker.plugins.visualizations.add({
       </style>
     `;
 
-    this.loadingGrid = element.appendChild(document.createElement('div'));
-    this.loadingGrid.id = 'loading';
+    this.loadingGrid = element.appendChild(document.createElement("div"));
+    this.loadingGrid.id = "loading";
 
     // Create an element to contain the grid.
-    this.grid = element.appendChild(document.createElement('div'));
-    this.grid.id = 'ag-grid-vis';
+    this.grid = element.appendChild(document.createElement("div"));
+    this.grid.id = "ag-grid-vis";
 
     this.grid.classList.add(defaultTheme);
     new agGrid.Grid(this.grid, gridOptions);
@@ -1079,19 +1196,24 @@ looker.plugins.visualizations.add({
     modifyOptions(this, config);
 
     const { fields } = queryResponse;
-    const { dimensions, measures, pivots, table_calculations: tableCalcs } = fields;
+    const {
+      dimensions,
+      measures,
+      pivots,
+      table_calculations: tableCalcs,
+    } = fields;
     if (dimensions.length === 0) {
       this.addError({
-        message: 'This chart requires dimensions.',
-        title: 'No Dimensions',
+        message: "This chart requires dimensions.",
+        title: "No Dimensions",
       });
       return;
     }
 
-    if (!_.isEmpty(pivots) && (_.isEmpty(measures) && _.isEmpty(tableCalcs))) {
+    if (!_.isEmpty(pivots) && _.isEmpty(measures) && _.isEmpty(tableCalcs)) {
       this.addError({
-        message: 'Add a measure or table calculation to pivot on.',
-        title: 'Empty Pivot(s)',
+        message: "Add a measure or table calculation to pivot on.",
+        title: "Empty Pivot(s)",
       });
       return;
     }
