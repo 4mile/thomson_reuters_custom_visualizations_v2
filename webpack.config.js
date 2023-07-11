@@ -1,6 +1,7 @@
 var path = require("path");
 
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 var webpackConfig = {
   mode: "production",
@@ -27,7 +28,17 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"],
   },
-  plugins: [new UglifyJSPlugin()],
+  plugins: [
+    new UglifyJSPlugin(),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/examples/advanced_table/ag-theme-thomson-reuters.css",
+          to: "ag-theme-thomson-reuters.css",
+        },
+      ],
+    }),
+  ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },

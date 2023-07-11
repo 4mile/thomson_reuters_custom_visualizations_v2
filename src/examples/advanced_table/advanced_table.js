@@ -123,6 +123,7 @@ const updateTheme = (classList, theme) => {
 // All of the currently supported ag-grid stylesheets.
 const themes = [
   { Looker: "ag-theme-looker" },
+  { "Thomson Reuters": "ag-theme-thomson-reuters" },
   { Balham: "ag-theme-balham" },
   { Fresh: "ag-theme-fresh" },
   { Dark: "ag-theme-dark" },
@@ -146,10 +147,14 @@ const loadStylesheets = () => {
   addCSS("https://unpkg.com/ag-grid-community@20.1.0/dist/styles/ag-grid.css");
   addCSS("https://4mile.github.io/ag_grid/ag-theme-looker.css");
   // XXX For development only:
-  // addCSS('https://localhost:4443/ag-theme-looker.css');
+  // assuming http-server is running @ PORT 5150
+  addCSS("https://localhost:5150/ag-theme-thomson-reuters.css");
   themes.forEach((theme) => {
     const themeName = theme[Object.keys(theme)];
-    if (themeName !== "ag-theme-looker") {
+    if (
+      themeName !== "ag-theme-looker" &&
+      themeName !== "ag-theme-thomson-reuters"
+    ) {
       addCSS(
         `https://unpkg.com/ag-grid-community@20.1.0/dist/styles/${themeName}.css`
       );
