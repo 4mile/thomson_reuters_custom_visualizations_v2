@@ -146,9 +146,15 @@ const addCSS = (link) => {
 const loadStylesheets = () => {
   addCSS("https://unpkg.com/ag-grid-community@20.1.0/dist/styles/ag-grid.css");
   addCSS("https://4mile.github.io/ag_grid/ag-theme-looker.css");
-  // XXX For development only:
-  // assuming http-server is running @ PORT 5150
-  addCSS("https://localhost:5150/ag-theme-thomson-reuters.css");
+
+  /** **************************************************
+   * XXX For development only:
+   * assuming http-server is running @ PORT 5150
+   * See copy plugin in webpack config
+   *  **************************************************/
+  // addCSS("https://localhost:5150/ag-theme-thomson-reuters.css");
+
+  // run through themes, skipping some
   themes.forEach((theme) => {
     const themeName = theme[Object.keys(theme)];
     if (
