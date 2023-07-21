@@ -123,7 +123,8 @@ const updateTheme = (classList, theme) => {
 // All of the currently supported ag-grid stylesheets.
 const themes = [
   { Looker: "ag-theme-looker" },
-  { "Thomson Reuters": "ag-theme-thomson-reuters" },
+  // PUGGA
+  //{ "Thomson Reuters": "ag-theme-thomson-reuters" },
   { Balham: "ag-theme-balham" },
   { Fresh: "ag-theme-fresh" },
   { Dark: "ag-theme-dark" },
@@ -150,7 +151,7 @@ const loadStylesheets = () => {
   /** **************************************************
    * XXX For development only:
    * assuming http-server is running @ PORT 5150
-   * See copy plugin in webpack config
+   * See the "copy" plugin in webpack config
    *  **************************************************/
   // addCSS("https://localhost:5150/ag-theme-thomson-reuters.css");
 
@@ -1053,6 +1054,11 @@ const modifyOptions = (vis, config) => {
 
   setupConditionalFormatting(vis, config, measureLike);
 
+  // PUGGA
+  // console.log("=".repeat(30));
+  // console.log(options);
+  // console.log("=".repeat(30));
+
   vis.trigger("registerOptions", options);
 };
 
@@ -1187,6 +1193,9 @@ looker.plugins.visualizations.add({
       </style>
     `;
 
+    /**
+     * create the loading overlay
+     */
     this.loadingGrid = element.appendChild(document.createElement("div"));
     this.loadingGrid.id = "loading";
 

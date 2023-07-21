@@ -160,7 +160,8 @@ export const options = {
     type: "string",
     values: [
       { Looker: "ag-theme-looker" },
-      { "Thomson Reuters": "ag-theme-thomson-reuters" },
+      // PUGGA
+      // { "Thomson Reuters": "ag-theme-thomson-reuters" },
       { Balham: "ag-theme-balham" },
       { Fresh: "ag-theme-fresh" },
       { Dark: "ag-theme-dark" },

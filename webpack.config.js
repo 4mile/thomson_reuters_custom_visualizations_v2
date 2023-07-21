@@ -33,6 +33,10 @@ var webpackConfig = {
     new CopyPlugin({
       patterns: [
         {
+          from: "src/examples/advanced_table/ag-theme-looker.css",
+          to: "ag-theme-looker.css",
+        },
+        {
           from: "src/examples/advanced_table/ag-theme-thomson-reuters.css",
           to: "ag-theme-thomson-reuters.css",
         },
